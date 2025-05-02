@@ -1,0 +1,69 @@
+version: 3.0
+networks:
+    caddy:
+services:
+    server:
+        build: .
+        container_name: kodhod
+        ports:
+            - 3000:3000
+        secrets:
+            - auth0-secret
+            - auth0-domain
+            - auth0-client-secret
+            - db-password
+            - m2m-secret
+        environment:
+            - AUTH0_SECRET=/run/secrets/auth0-secret
+            - APP_BASE_URL="https://kodhod.hu"
+            - AUTH0_DOMAIN=/run/secrets/auth0-domain
+            - AUTH0_CLIENT_ID="j3pUjLlSgzMovw8sVnjM4JjeljxjEUn7"
+            - AUTH0_CLIENT_SECRET=/run/secrets/auth0-client-secret
+            - AUTH0_MANAGEMENT_API_AUDIENCE="https://dev-e4e8czmrvjxs8iah.eu.auth0.com/api/v2/"
+            - POSTGRES_URL="postgres://default:@ep-fragrant-snowflake-a258fbvl-pooler.eu-central-1.aws.neon.tech:5432/verceldb?sslmode=require"
+            - POSTGRES_USER="default"
+            - POSTGRES_HOST="ep-fragrant-snowflake-a258fbvl-pooler.eu-central-1.aws.neon.tech"
+            - POSTGRES_PASSWORD=/run/secrets/db-password
+            - POSTGRESS_DATABASE="verceldb"
+            - TORK_URL="127.0.0.1:8000"
+            - M2M_CLIENT_ID="7Qs5pxUcIvzKhX4a4tYWj7eErVrCumJS"
+            - M2M_CLIENT_SECRET=/run/secrets/m2m-secret
+        deploy:
+            mode: replicated
+            replicas: 3
+        networks:
+            - caddy
+    tork:
+        image: ghcr.io/khacke/kodhoddockerfiles/kodhodtorkengine
+        container_name: tork_server
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+    caddy:
+        image: caddy
+        restart: unless-stopped
+        container_name: caddy
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - /home/meow/containers/caddy/Caddyfile:/etc/caddy/Caddyfile
+            - /home/meow/containers/caddy/site:/srv
+            - /home/meow/containers/caddy/caddy_data:/data
+            - /home/meow/containers/caddy/caddy_config:/config
+        networks:
+            - caddy
+secrets:
+    auth0-secret:
+        file: env/auth0_secret
+    auth0-domain:
+        file: env/auth0_domain
+    auth0-client-secret:
+        file: env/auth0_client_secret
+    db-password:
+        file: env/db_password
+    m2m-secret:
+        file: env/m2m_secret
+volumes:
+    caddy_data:
+        external: true
+    caddy_config:

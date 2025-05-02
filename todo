@@ -1,0 +1,17 @@
+# profile form
+#   - backend to update user
+#   - make form work
+# create form
+#   # - make form work
+#   # - auto update codemirrors
+#   # - backend to create problem
+# problem page
+#   # - auto fetch username by user_id
+# dashboard
+#   # - clean up random form
+#   # - skip button
+- favicon
+- create form markdown remove two buttons
+- create form markdown fix colors
+- ctrl + S run code
+- testeljuk hogy a tobbi nyelv mukodik))))
